@@ -12,6 +12,9 @@ from django.contrib.auth import logout
 
 # Create your views here.
 def index(request):
+
+    request.session.set_test_cookie()
+
      # Query the database for a list of ALL categories currently stored.
     # Order the categories by no. likes in descending order.
     # Retrieve the top 5 only - or all if less than 5.
@@ -38,9 +41,6 @@ def category(request, category_name_slug):
         # So the .get() method returns one model instance or raises an exception.
         category = Category.objects.get(slug=category_name_slug)
         context_dict['category_name'] = category.name
-
-        #Add category slug to context dict to pass it to add page
-        context_dict['category_slug'] = category_name_slug
 
         # Retrieve all of the associated pages.
         # Note that filter returns >= 1 model instance.
@@ -105,12 +105,11 @@ def add_page(request, category_name_slug):
     else:
         form = PageForm()
 
-    context_dict = {'form':form, 'category': cat, 'cat_slug':category_name_slug}
+    context_dict = {'form':form, 'category': cat}
 
     return render(request, 'rango/add_page.html', context_dict)
 
 def register(request):
-
     # A boolean value for telling the template whether the registration was successful.
     # Set to False initially. Code changes value to True when registration succeeds.
     registered = False
@@ -209,7 +208,7 @@ def user_login(request):
 
 @login_required
 def restricted(request):
-    return HttpResponse("Since you're logged in, you can see this text!")
+    return render(request, 'rango/restricted.html', {})
 
 # Use the login_required() decorator to ensure only those logged in can access the view.
 @login_required
